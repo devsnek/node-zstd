@@ -34,13 +34,18 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
 
     ZSTD_outBuffer output = { buffOut, buffOutSize, 0 };
 
-    //while (input.pos < input.size) {
-    //  output.pos = 0;
+    while (input.pos < input.size) {
       size_t const r = ZSTD_decompressStream(stream_, &output, &input);
+      if (r == -70 /* ZSTD_error_dstSize_tooSmall */) {
+        size_t const newSize = output.size * 2;
+        output.dst = realloc(output.dst, newSize);
+        output.size = newSize;
+        continue;
+      }
       if (ZSTD_isError(r)) {
         NAPI_THROW(Napi::Error::New(Env(), ZSTD_getErrorName(r)), Napi::Value());
       }
-    //}
+    }
 
     return Napi::ArrayBuffer::New(Env(), output.dst, output.pos);
   }
