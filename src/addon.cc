@@ -10,9 +10,6 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
       InstanceMethod("decompress", &DecompressStream::Decompress),
     });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
-
     exports.Set("DecompressStream", func);
     return exports;
   }
@@ -23,8 +20,6 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
   }
 
  private:
-  static Napi::FunctionReference constructor;
-
   Napi::Value Decompress(const Napi::CallbackInfo& info) {
     if (!info[0].IsArrayBuffer()) {
       NAPI_THROW(Napi::Error::New(Env(), "Argument must be an ArrayBuffer"), Napi::Value());
@@ -52,8 +47,6 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
 
   ZSTD_DStream* stream_;
 };
-
-Napi::FunctionReference DecompressStream::constructor;
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   return DecompressStream::Init(env, exports);
