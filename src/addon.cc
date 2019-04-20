@@ -47,7 +47,9 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
       }
     }
 
-    return Napi::ArrayBuffer::New(Env(), output.dst, output.pos);
+    return Napi::ArrayBuffer::New(Env(), output.dst, output.pos, [](Napi::Env, void* externalData) {
+      free(externalData);
+    });
   }
 
   ZSTD_DStream* stream_;
