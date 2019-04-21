@@ -1,6 +1,6 @@
 {
-  "name": "zstd",
-  "version": "1.0.0",
+  "name": "zucc",
+  "version": "0.1.0",
   "description": "",
   "main": "src/index.js",
   "dependencies": {
@@ -9,10 +9,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "install": "node-gyp rebuild"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "devsnek",
+  "license": "MIT",
   "gypfile": true
 }

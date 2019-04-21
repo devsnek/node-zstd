@@ -15,8 +15,11 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
   }
 
   DecompressStream(const Napi::CallbackInfo& info) : Napi::ObjectWrap<DecompressStream>(info) {
-     stream_ = ZSTD_createDStream();
-     ZSTD_initDStream(stream_);
+    stream_ = ZSTD_createDStream();
+    size_t const r = ZSTD_initDStream(stream_);
+    if (ZSTD_isError(r)) {
+      NAPI_THROW(Napi::Error::New(Env(), ZSTD_getErrorName(r)));
+    }
   }
 
  private:

@@ -1,7 +1,8 @@
-# node-zstd
+# zucc
 
 ```js
-const stream = new zstd.DecompressStream();
+const { DecompressStream } = require('zucc');
 
+const stream = new DecompressStream();
 const ab = stream.decompress(arrayBufferOfCompressedData);
 ```
