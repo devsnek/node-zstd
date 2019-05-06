@@ -40,7 +40,7 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
     while (input.pos < input.size) {
       size_t const r = ZSTD_decompressStream(stream_, &output, &input);
       if (r == -70 /* ZSTD_error_dstSize_tooSmall */) {
-        size_t const newSize = output.size * 2;
+        size_t const newSize = output.size * 1.5;
         output.dst = realloc(output.dst, newSize);
         output.size = newSize;
         continue;

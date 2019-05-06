@@ -1,5 +1,7 @@
 # zucc
 
+Zstandard compression bindings for Node.js
+
 ```js
 const { DecompressStream } = require('zucc');
 
