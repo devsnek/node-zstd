@@ -11,6 +11,10 @@
   "scripts": {
     "install": "node-gyp rebuild"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devsnek/node-zstd.git"
+  },
   "author": "devsnek",
   "license": "MIT",
   "gypfile": true
