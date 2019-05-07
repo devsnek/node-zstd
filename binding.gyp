@@ -3,8 +3,6 @@
     {
       'target_name': 'zstd',
       'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ],
-      'cflags': [ '-fno-exceptions' ],
-      'cflags_cc': [ '-fno-exceptions' ],
       'msvs_settings': {
         'VCCLCompilerTool': {
           'ExceptionHandling': 0,
@@ -35,8 +33,8 @@
           }
         }]
       ],
-      'cflags': [ '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wunused-parameter' ],
-      'cflags_cc': [ '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wunused-parameter' ],
+      'cflags': [ '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wunused-parameter',  '-fno-exceptions' ],
+      'cflags_cc': [ '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wunused-parameter', '-fno-exceptions' ],
     },
   ],
 }

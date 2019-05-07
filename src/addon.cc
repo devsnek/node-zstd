@@ -14,18 +14,22 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
     return exports;
   }
 
-  DecompressStream(const Napi::CallbackInfo& info) : Napi::ObjectWrap<DecompressStream>(info) {
+  explicit DecompressStream(const Napi::CallbackInfo& info)
+    : Napi::ObjectWrap<DecompressStream>(info) {
     stream_ = ZSTD_createDStream();
-    size_t const r = ZSTD_initDStream(stream_);
+    const int r = ZSTD_initDStream(stream_);
     if (ZSTD_isError(r)) {
-      NAPI_THROW(Napi::Error::New(Env(), ZSTD_getErrorName(r)));
+      Napi::Error::New(Env(), ZSTD_getErrorName(r))
+        .ThrowAsJavaScriptException();
     }
   }
 
  private:
   Napi::Value Decompress(const Napi::CallbackInfo& info) {
     if (!info[0].IsArrayBuffer()) {
-      NAPI_THROW(Napi::Error::New(Env(), "Argument must be an ArrayBuffer"), Napi::Value());
+      NAPI_THROW(
+          Napi::Error::New(Env(), "Argument must be an ArrayBuffer"),
+          Napi::Value());
     }
 
     Napi::ArrayBuffer buffInJS = info[0].As<Napi::ArrayBuffer>();
@@ -38,7 +42,7 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
     ZSTD_outBuffer output = { buffOut, buffOutSize, 0 };
 
     while (input.pos < input.size) {
-      size_t const r = ZSTD_decompressStream(stream_, &output, &input);
+      const int r = ZSTD_decompressStream(stream_, &output, &input);
       if (r == -70 /* ZSTD_error_dstSize_tooSmall */) {
         size_t const newSize = output.size * 1.5;
         output.dst = realloc(output.dst, newSize);
@@ -46,13 +50,16 @@ class DecompressStream : public Napi::ObjectWrap<DecompressStream> {
         continue;
       }
       if (ZSTD_isError(r)) {
-        NAPI_THROW(Napi::Error::New(Env(), ZSTD_getErrorName(r)), Napi::Value());
+        NAPI_THROW(
+            Napi::Error::New(Env(), ZSTD_getErrorName(r)), Napi::Value());
       }
     }
 
-    return Napi::ArrayBuffer::New(Env(), output.dst, output.pos, [](Napi::Env, void* externalData) {
-      free(externalData);
-    });
+    return Napi::ArrayBuffer::New(
+        Env(), output.dst, output.pos,
+        [](Napi::Env, void* externalData) {
+          free(externalData);
+        });
   }
 
   ZSTD_DStream* stream_;
