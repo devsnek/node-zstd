@@ -1,0 +1,15 @@
+[package]
+name = "node-zstd"
+version = "0.1.0"
+authors = ["Gus Caplan <me@gus.host>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[build-dependencies]
+bindgen = "0.49"
+cc = { version = "1.0", features = ["parallel"] }
+
+[dependencies]
+wasm-bindgen = "0.2"
