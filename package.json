@@ -9,7 +9,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "install": "node-gyp rebuild"
+    "install": "node-gyp rebuild",
+    "build-rust": "cargo build --target wasm32-unknown-unknown && WASM_BINDGEN_WEAKREF=1 wasm-bindgen target/wasm32-unknown-unknown/debug/node_zstd.wasm --out-dir pkg --no-typescript --target nodejs"
   },
   "repository": {
     "type": "git",
