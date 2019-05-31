@@ -3,20 +3,14 @@
   "version": "0.1.2",
   "description": "",
   "main": "src/index.js",
-  "dependencies": {
-    "bindings": "^1.5.0",
-    "node-addon-api": "^1.6.3"
-  },
   "devDependencies": {},
   "scripts": {
-    "install": "node-gyp rebuild",
-    "build-rust": "cargo build --target wasm32-unknown-unknown && WASM_BINDGEN_WEAKREF=1 wasm-bindgen target/wasm32-unknown-unknown/debug/node_zstd.wasm --out-dir pkg --no-typescript --target nodejs"
+    "build-rust": "cargo build --release --target wasm32-unknown-unknown && wasm-bindgen target/wasm32-unknown-unknown/release/node_zstd.wasm --out-dir pkg --no-typescript --target nodejs"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/devsnek/node-zstd.git"
   },
   "author": "devsnek",
-  "license": "MIT",
-  "gypfile": true
+  "license": "MIT"
 }

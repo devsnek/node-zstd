@@ -45,60 +45,64 @@ pub fn start() {
 #[wasm_bindgen]
 pub struct DecompressStream {
     stream: *mut ZSTD_DStream,
+    buffer: Vec<u8>,
+}
+
+unsafe fn handle(r: usize) -> Result<(), JsValue> {
+    if ZSTD_isError(r) == 1 {
+        let message = std::ffi::CStr::from_ptr(ZSTD_getErrorName(r));
+        let message = message.to_str().unwrap();
+        let message = &format!("ZSTD error: {}", message);
+        Err(JsValue::from_str(message))
+    } else {
+        Ok(())
+    }
 }
 
 #[wasm_bindgen]
 impl DecompressStream {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> DecompressStream {
-        let stream = unsafe {
+    pub fn default() -> Result<DecompressStream, JsValue> {
+        let (stream, buffer_size) = unsafe {
             let stream = ZSTD_createDStream();
             let r = ZSTD_initDStream(stream);
-            if ZSTD_isError(r) == 1 {
-                panic!("ZSTD error {}", ZSTD_getErrorCode(r));
-            }
-            stream
+            handle(r)?;
+            (stream, ZSTD_DStreamOutSize())
         };
-        DecompressStream { stream }
+        let buffer = vec![0; buffer_size];
+        Ok(DecompressStream { stream, buffer })
     }
 
-    pub fn decompress(&self, data: &mut [u8]) -> Vec<u8> {
+    pub fn decompress(&mut self, data: &mut [u8]) -> Result<Vec<u8>, JsValue> {
         let mut input = ZSTD_inBuffer {
             src: data.as_mut_ptr() as *mut std::ffi::c_void,
             size: data.len(),
             pos: 0,
         };
-        let buf_out_size = std::cmp::max(unsafe { ZSTD_DStreamOutSize() }, 65536);
-        let mut buf_out: Vec<u8> = Vec::with_capacity(buf_out_size);
-        unsafe {
-            buf_out.set_len(buf_out_size);
-        }
 
-        let mut output = ZSTD_outBuffer {
-            dst: buf_out.as_mut_ptr() as *mut std::ffi::c_void,
-            size: buf_out_size,
-            pos: 0,
-        };
+        let mut result = Vec::with_capacity(4096);
+        loop {
+            let out_pos = {
+                let mut buf_out = ZSTD_outBuffer {
+                    dst: self.buffer.as_mut_ptr() as *mut std::ffi::c_void,
+                    size: self.buffer.len(),
+                    pos: 0,
+                };
 
-        while input.pos < input.size {
-            let r = unsafe { ZSTD_decompressStream(self.stream, &mut output, &mut input) };
-            if unsafe { ZSTD_isError(r) } == 1 {
-                match unsafe { ZSTD_getErrorCode(r) } {
-                    ZSTD_ErrorCode_ZSTD_error_dstSize_tooSmall => {
-                        let new_size = output.size * 2;
-                        unsafe {
-                            (*(output.dst as *mut Vec<u8>)).set_len(new_size);
-                        }
-                        output.size = new_size;
-                    }
-                    v => {
-                        panic!("ZSTD error {}", v);
-                    }
+                unsafe {
+                    let r = ZSTD_decompressStream(self.stream, &mut buf_out, &mut input);
+                    handle(r)?;
+                    buf_out.pos
                 }
+            };
+
+            result.extend_from_slice(&self.buffer[0..out_pos]);
+
+            if out_pos < self.buffer.len() {
+                break;
             }
         }
 
-        buf_out.truncate(output.pos);
-        buf_out
+        Ok(result)
     }
 }
