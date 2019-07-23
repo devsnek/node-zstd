@@ -1,5 +1,5 @@
 'use strict';
 
-const { DecompressStream } = require('../pkg/node_zstd.js');
+const { DecompressStream } = require('../pkg');
 
 module.exports = { DecompressStream };
