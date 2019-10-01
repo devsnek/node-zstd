@@ -18,11 +18,15 @@ pub unsafe extern "C" fn malloc(size: usize) -> *mut u8 {
     if let Ok(layout) =
         std::alloc::Layout::from_size_align(size + std::mem::size_of::<usize>(), align)
     {
-        let ptr = std::alloc::alloc(layout);
-        *(ptr as *mut usize) = size;
-        ptr.add(std::mem::size_of::<usize>())
+        let ptr = std::alloc::alloc(layout) as *mut usize;
+        if ptr.is_null() {
+            std::ptr::null_mut()
+        } else {
+            *ptr = size;
+            ptr.offset(1) as *mut u8
+        }
     } else {
-        std::ptr::null_mut::<u8>()
+        std::ptr::null_mut()
     }
 }
 

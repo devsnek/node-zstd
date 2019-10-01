@@ -1,11 +1,17 @@
 {
   "name": "zucc",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "",
   "main": "src/index.js",
+  "files": [
+    "src/index.js",
+    "pkg/node_zstd.js",
+    "pkg/node_zstd_bg.js",
+    "pkg/node_zstd_bg.wasm"
+  ],
   "devDependencies": {},
   "scripts": {
-    "build-rust": "wasm-pack build --no-typescript --target nodejs"
+    "build-rust": "WASM_INTERFACE_TYPES=1 wasm-pack build --no-typescript --target nodejs"
   },
   "repository": {
     "type": "git",

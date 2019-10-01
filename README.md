@@ -6,5 +6,6 @@ Zstandard compression bindings for Node.js
 const { DecompressStream } = require('zucc');
 
 const stream = new DecompressStream();
-const ab = stream.decompress(arrayBufferOfCompressedData);
+const ab = stream.decompress(uint8ArrayOfCompressedData);
+stream.free();
 ```

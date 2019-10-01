@@ -3,8 +3,9 @@ name = "node-zstd"
 version = "0.1.0"
 authors = ["Gus Caplan <me@gus.host>"]
 edition = "2018"
-license-file="LICENSE"
-repository="https://github.com/devsnek/node-zstd"
+license-file = "LICENSE"
+repository = "https://github.com/devsnek/node-zstd"
+description = ""
 
 [lib]
 crate-type = ["cdylib"]
